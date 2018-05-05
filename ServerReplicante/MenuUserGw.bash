@@ -26,7 +26,7 @@ do
   case $INPUT_STRING in
 	1)
 		echo "DHCP Server "
-		bash /srv/Projeto.Palha/ServerReplicante/ScriptDhcpServer.bash
+		bash /srv/Projeto.Palha/ServerReplicante/scripts/ScriptDhcpServer.bash
 		break
 		;;
 	2)
