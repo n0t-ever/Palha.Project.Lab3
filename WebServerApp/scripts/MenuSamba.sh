@@ -32,7 +32,7 @@ do
 		;;	
 	3)
 		echo "Suspender Usuario"
-		bash '$(pwd)/Samba/SuspUser.bash'
+		bash /srv/Projeto.Palha/ServerWebApp/scripts/samba/SuspUser.bash
 		break
 		;;	
 	4)
