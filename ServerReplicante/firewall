@@ -1,0 +1,72 @@
+#!/bin/bash
+# firewall	- Daemon de Regras do Iptables
+# Acionado por /etc/init.d/firewall start	
+# -----------------------------------------------------------------------------------------  #
+# Este Programa tem como objetivo liberar ou bloquear a passagem de pacotes pelo kernel, e   #
+# e criar um serviço que possa habilitar ou limpar as regras do iptable.
+
+#  Licença: LGPL v3 (GNU Lesser General Public License v3.0)								 #
+#  #######################################################################################   #
+
+### BEGIN INIT INFO
+# Provides:		firewall
+# Required-Start:	$syslog
+# Required-Stop:	$syslog
+# Default-Start:	2 3 4 5
+# Default-Stop:		
+# Short-Description:	Serviço de Firewall
+### END INIT INFO
+
+#	Criar uma função para parecer que tem uma barra de "loading"
+ProgressBar() {
+  tput civis
+  for X in $(seq 20)
+  do  
+    for i in ..
+    do  
+      echo -en "\033[1D$i"
+      sleep .1
+    done
+  done
+  tput cnorm
+}
+
+#	Variáveis Posicionais, Iniciar com stop ou start
+case $1 in
+
+stop)
+
+# Definindo Politica ACCEPT - ACEITA TUDO
+	iptables -t filter -P OUTPUT ACCEPT
+	iptables -t filter -P INPUT ACCEPT
+	iptables -t filter -P FORWARD ACCEPT
+
+# Limpar as Regras de todas as tableas
+	iptables -t filter -F
+	iptables -t nat -F
+	iptables -t mangle -F
+	iptables -t raw -F
+	iptables -t security -F
+	
+# Bloquear a passagem de pacotes pelo kernel
+	echo 0 > /proc/sys/net/ipv4/ip_forward
+	echo -en "Stopping Firewall ";ProgressBar; echo -e '\033[01;32mOk\033[00;37m'  
+;;
+
+start)
+	$0 stop
+	sleep 0.5
+	echo -en "Starting Firewall ";ProgressBar; echo -e '\033[01;32mOk\033[00;37m'
+	
+# liberar a passagem de pacotes pelo kernel
+	echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# Iniciando as Regras
+	bash /srv/menu/scripts/rules
+;;
+
+*)
+	echo 'POR FAVOR USE "stop|start"'
+;;
+
+esac
