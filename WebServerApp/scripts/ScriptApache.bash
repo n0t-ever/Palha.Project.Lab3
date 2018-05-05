@@ -36,3 +36,4 @@ echo "www.${SiteConf}${DomSite}" >> /etc/hosts
 # #echo $SiteConf + " IN 	A 	192.168.34.55"	>> /etc/bind/zones/db.Replicante.org
 
 a2ensite $SiteConf.conf ; service apache2 restart
+bash /srv/Projeto.Palha/WebServerApp/MenuUser.bash
