@@ -5,42 +5,37 @@
 # Autor         : Ornitorrinco (2018) 
 # Manutenção    : Everton Soares de Olivera
 #
+# Atualizações
+# 23/05/2018 - Agora com interface mais amigavel
+#
 ## Licença: LGPL v3 (GNU Lesser General Public License v3.0)
 ##------------------------------------------------------------------------------------------
 
+# Verificar se o usuario é o root
 if [ 'root' != `whoami` ]; then
-	echo " Quem não é movido a Gasolina, precisa de Shell?! "
+	dialog --msgbox ' Quem não é movido a Gasolina, precisa de Shell?! ' 5 40
 	exit 1
 fi
 
-echo -e " Choose your destiny: escolha a opção:"
-echo "1 : Para Conf Samba e Gerenciamento de usuários; "
-echo "2 : Para Adcionar Virtual Site ao Apache; "
-
-echo "3 : Para Sair"
-
-while :
-do
-  read INPUT_STRING
-  case $INPUT_STRING in
-	1)
-		echo "Samba & Usuários... "
+#Loop que mostra o Menu
+while : ; do
+INPUT_STRING=$( dialog --stdout --menu 'Escolha a Opção: ' 0 0 0 \
+Samba ': Para Conf Samba e Gerenciamento de usuários; ' \
+Apache ': Para Adcionar Virtual Site ao Apache; ' \
+Sair ': Para Sair; ')
+# Apertou o ESC ou CANCELAR, então vamos sair ...
+[ $? -ne 0 ] && break
+# De Acordo com opção dispara o programa.
+case $INPUT_STRING in
+	Samba)
 		bash /srv/Projeto.Palha/ServerWebApp/scripts/MenuSamba.sh
-		break
 		;;
-	2)
-		echo "Apache & Virtual-Sites"
+	Apache)
 		bash /srv/Projeto.Palha/ServerWebApp/scripts/ScriptApache.bash
-		break
 		;;
-	3)
-		echo "See you again!"
-		break
-		;;
-	*)
-		echo "Digite uma opção valida"
-		;;
+	Sair)
+		break ;;
   esac
 done
-echo 
-echo "That's all folks!"
+# Mensagem Final
+dialog --title 'Encerrando aplicação' --msgbox 'Tchau Tia! ' 6 40
