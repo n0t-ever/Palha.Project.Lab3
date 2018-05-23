@@ -6,51 +6,39 @@
 # Autor         : Ornitorrinco (2018) 
 # Manutenção    : Everton Soares de Olivera
 #
+# Atualizações
+# 23/05/2018 - Agora com interface mais amigavel.
+#
 ## Licença: LGPL v3 (GNU Lesser General Public License v3.0)
 #-----------------------------------------------------------------------------------------
-
-echo "MENU: Escolha a opção:"
-echo  " 1 : Para adcionar um novo compartilhamento"
-echo  " 2 : Para adcionar novos usuarios"
-echo  " 3 : Para Suspender um usuário "
-echo  " 4 : Para Procurar/Excluir um compartilhamento "
-echo  " q : Para Sair"
-
-while :
-do
-  read SAMBA_STRING
+# Loop que Mostra o Menu.
+while : ; do 
+# Mostra na tela as seguintes opções.
+SAMBA_STRING=$( dialog --stdout --title 'Menu do Samba ' --menu 'Escolha a opção: '\
+0 0 0
+1 'Para adcionar um novo compartilhamento ' \
+2 'Para adcionar novos usuarios ' \
+3 'Para Suspender um usuário ' \
+4 'Para Procurar/Excluir um compartilhamento ' \
+q 'Para Sair')
+# Apertou o ESC ou CANCELAR, então vamos sair ...
+[ $? -ne 0 ] && break
+# De Acordo com opção dispara o programa.
   case $SAMBA_STRING in
 	1)
-		echo "Novo Compartilhamento!"
-		bash /srv/Projeto.Palha/ServerWebApp/scripts/samba/SambaShare.bash
-		break
-		;;
+		bash /srv/Projeto.Palha/ServerWebApp/scripts/samba/SambaShare.bash ;;
 	2)
-		echo "Novo Usuario "
-		bash /srv/Projeto.Palha/ServerWebApp/scripts/samba/adduser.bash
-		break
-		;;	
+		bash /srv/Projeto.Palha/ServerWebApp/scripts/samba/adduser.bash ;;	
 	3)
-		echo "Suspender Usuario"
-		bash /srv/Projeto.Palha/ServerWebApp/scripts/samba/SuspUser.bash
-		break
-		;;	
+		bash /srv/Projeto.Palha/ServerWebApp/scripts/samba/SuspUser.bash ;;	
 	4)
-		echo "Procurar/Excluir Compartilhamento "
-		bash /srv/Projeto.Palha/ServerWebApp/scripts/samba//SearchSamba.bash
-		break
-		;;
-	q|Q)
-		echo "That's all folks!"
-		break
-		;;
-	*)
-		echo "Digite uma opção valida"
-		;;
+		bash /srv/Projeto.Palha/ServerWebApp/scripts/samba//SearchSamba.bash ;;
+	q)
+		break ;;
   esac
 done
-echo  " "
-echo -e "Fim do processo..." ; /etc/init.d/samba restart
-
+# Mensagem Final
+dialog --title 'Encerrando aplicação' --msgbox 'Fim do processo... ' 6 40
+/etc/init.d/samba restart
 #Voltamos a prancheta de lançamento...
 bash /srv/Projeto.Palha/ServerWebApp/MenuUser.bash
