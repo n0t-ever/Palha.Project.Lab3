@@ -15,7 +15,7 @@
 while : ; do 
 # Mostra na tela as seguintes opções.
 SAMBA_STRING=$( dialog --stdout --title 'Menu do Samba ' --menu 'Escolha a opção: '\
-0 0 0
+0 0 0 \
 1 'Para adcionar um novo compartilhamento ' \
 2 'Para adcionar novos usuarios ' \
 3 'Para Suspender um usuário ' \
