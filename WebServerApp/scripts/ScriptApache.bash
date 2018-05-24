@@ -26,9 +26,9 @@ touch /etc/apache2/sites-available/$SiteConf.conf
 # Atribuir permisão para os arquivos
 chmod 755 '/etc/apache2/sites-available/'$SiteConf.conf
 
-# Vamos inserias as arquivo
+# Vamos construir o arquivo com as opções...
 echo "<VirtualHost *:80>" >> /etc/apache2/sites-available/$SiteConf.conf
-
+# Se a variavel WebAdmin estiver vazia, será inerido teste@teste.com
 echo "ServerAdmin ${WebAdmin:-teste@teste.com} " >> /etc/apache2/sites-available/$SiteConf.conf
 echo "ServerName ${SiteConf}" >>  /etc/apache2/sites-available/$SiteConf.conf
 echo "ServerAlias www.${SiteConf}${DomSite} " >> /etc/apache2/sites-available/$SiteConf.conf
@@ -36,13 +36,14 @@ echo "DocumentRoot " $PathSite >> /etc/apache2/sites-available/$SiteConf.conf
 echo "ErrorLog ${APACHE_LOG_DIR}/error.log " >> /etc/apache2/sites-available/$SiteConf.conf
 echo "CustomLog ${APACHE_LOG_DIR}/access.log combined " >>  /etc/apache2/sites-available/$SiteConf.conf
 echo "</VirtualHost>" >>  /etc/apache2/sites-available/$SiteConf.conf
+# Colocando o nome do site no arquivo hosts.
 echo "www.${SiteConf}${DomSite}" >> /etc/hosts
 
 # #Vamos mexer mesmo no DNS?
 # #echo $SiteConf + " IN 	A 	192.168.34.55"	>> /etc/bind/zones/db.Replicante.org
-
+#Vamos habilitar o site.
 a2ensite $SiteConf.conf
-#Reiniciar o serviço
+#Reiniciando o serviço
 service apache2 stop && service apache2 start
-#Voltamos a pancheta de lançamento.
+#Voltamos a prancheta de lançamento.
 bash /srv/Projeto.Palha/WebServerApp/MenuUser.bash
