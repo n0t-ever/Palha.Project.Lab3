@@ -1,16 +1,17 @@
 #!/bin/bash
 # SearchSamba.bash   --    Procura pelo [Nome do Compartilhamento] até a palavra ###END###,  #
 # Acionado por /srv/Projeto.Palha/ServerWebApp/scripts/MenuSamba.sh
-
 # ----------------------------------------------------------------------------------------   #
 # Ao encontrar mostrará na tela o compartilhamento. Poderá optar em excluir ou não,          #
 # caso seja excluido será feito uma copia do arquivo /etc/samba/smb.conf em /tmp.            #
-
-# ########################################################################################   #
+#
+# Atualizações
+# 23/05/2018 - Agora com interface mais amigavel
+#
 # Licença: LGPL v3 (GNU Lesser General Public License v3.0)
-# -----------------------------------------------------------------------------------------  #
+# ########################################################################################   #
 
-echo -e "Procurar/Excluir Compartilhamento "
+echo -e "Procurar/Excluir Compartilhamento " 
 DateBKP=$(date +%d:%B:%Y.%H:%M:%S)
 
 echo -n "Qual o nome do Compartilhamento? "; read ShareFinder
