@@ -11,18 +11,13 @@
 #
 ## Licença: LGPL v3 (GNU Lesser General Public License v3.0)
 #  #######################################################################################   #
-
-echo "Script para configurar novos compartilhamentos no SAMBA "
-
+#Funções
 function CopyTemplate() {
-echo 'public = yes'
-echo 'writable = yes'
-echo 'guest ok = yes'
-echo 'browseable = yes'
-echo '################'
-echo '###Gerado de Forma Automática###'
+echo 'public = yes' ; echo 'writable = yes' ; echo 'guest ok = yes'
+echo 'browseable = yes' ; echo '################' ; echo '###Gerado de Forma Automática###'
 }
 
+echo "Script para configurar novos compartilhamentos no SAMBA "
 DefaultVariavel="no"
 
 echo -n "Entre com o nome do novo compartilhamento "; read FolderShare
@@ -42,21 +37,37 @@ if [ $EXPRESS == "s" ]; then
 	else
 		echo "Configurar"	
 	
-echo "Diretorio publico, digite [no]/[yes] ou pressione enter para ignorar"
+proxima=primeira
+# Vamos começsr a festa
+while : ; do
+ case "$proxima" in
+  primeira)
+  	proxima=browseable
+	dialog --backtitle 'Criar Compartilhamento do Samba' --msgbox 'Bem vindo!!' 0 0
+	;;
+ browseable)
+ 	proxima=publico	
+	dialogb --title 'Browseable' --yesno '\nVai mostrar no explorer digite [no]/[yes]. \
+	ou pressione CANCEL para ignorar\n\n' 0 0
+		if [ $? -eq 0 ]; then
+			echo "browseable = yes ">> /etc/samba/smb.conf
+		fi
+		if  [ $? -eq 1 ]; then
+			echo "browseable = no ">> /etc/samba/smb.conf
+		else
+			echo "#browseable = yes ">> /etc/samba/smb.conf
+		fi
+		;;
+ publico)
+ 	proxima=escrita
+	"Diretorio publico, digite [no]/[yes] ou pressione enter para ignorar"
 	read UserDir
 		if [ ! "$UserDir" ]; then
 			echo "#public ="$DefaultVariavel >> /etc/samba/smb.conf
 		else
             echo "public = "$UserDir >> /etc/samba/smb.conf  
 		fi
-
-echo "Vai mostrar no explorer digite [no]/[yes] ou pressione enter para ignorar"
-	read UserBrow
-		if [ ! "$UserBrow" ]; then
-			echo "#browseable ="$DefaultVariavel	>> /etc/samba/smb.conf
-		else
-			echo "browseable = "$UserBrow >> /etc/samba/smb.conf
-		fi
+escrita)
 
 echo "Permitir escrita digite [no]/[yes] ou pressione enter para ignorar"
 	read UserWri
@@ -94,6 +105,7 @@ echo -e "Fim das escolhas..." ; echo -e "Adcionando Novo compartilhamento"
 echo "###END###" >> /etc/samba/smb.conf ; echo -e " " >> /etc/samba/smb.conf
 
 fi	
-
+esac
+done
 echo "That's all folks!"
 /etc/init.d/samba restart ; bash /srv/Projeto.Palha/ServerWebApp/scripts/MenuSamba.sh
