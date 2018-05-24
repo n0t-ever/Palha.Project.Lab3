@@ -18,7 +18,6 @@ echo 'browseable = yes' ; echo '################' ; echo '###Gerado de Forma Aut
 }
 
 echo "Script para configurar novos compartilhamentos no SAMBA "
-DefaultVariavel="no"
 
 echo -n "Entre com o nome do novo compartilhamento "; read FolderShare
 mkdir /srv/$FolderShare ; chmod 760 /srv/$FolderShare
@@ -28,27 +27,26 @@ echo "Descrição do compartilhamento " ; read CommentFolder
 echo "comment = "+ $CommentFolder >> /etc/samba/smb.conf
 echo "path = /srv/"$FolderShare >> /etc/samba/smb.conf
 
-echo -n "Usar as configurações expressas, (s)im ou (n)ão " ; read EXPRESS
+dialog --title 'public' --yesno "\nUsar as configurações expressas\n\n" 0 0
 
-if [ $EXPRESS == "s" ]; then
+	if [ $? -eq 0 ]; then
 		CopyTemplate >> /etc/samba/smb.conf
 		echo "###END###" >> /etc/samba/smb.conf
 		echo -e " " >> /etc/samba/smb.conf
 	else
-		echo "Configurar"	
 	
 proxima=primeira
 # Vamos começsr a festa
 while : ; do
  case "$proxima" in
-  primeira)
+ primeira)
   	proxima=browseable
 	dialog --backtitle 'Criar Compartilhamento do Samba' --msgbox 'Bem vindo!!' 0 0
 	;;
  browseable)
  	proxima=publico	
-	dialogb --title 'Browseable' --yesno '\nVai mostrar no explorer digite [no]/[yes]. \
-	ou pressione CANCEL para ignorar\n\n' 0 0
+	dialog --title 'Browseable' --yesno '\nVai mostrar no explorer [no]/[yes]. \
+	ou pressione CANCEL para ignorar\n\n' --help-button --help-label 'CANCEL' 0 0
 		if [ $? -eq 0 ]; then
 			echo "browseable = yes ">> /etc/samba/smb.conf
 		fi
@@ -60,46 +58,56 @@ while : ; do
 		;;
  publico)
  	proxima=escrita
-	"Diretorio publico, digite [no]/[yes] ou pressione enter para ignorar"
-	read UserDir
-		if [ ! "$UserDir" ]; then
-			echo "#public ="$DefaultVariavel >> /etc/samba/smb.conf
-		else
-            echo "public = "$UserDir >> /etc/samba/smb.conf  
+	dialog --title 'public' --yesno '\nDiretorio publico, [no]/[yes] ou pressione CANCEL para ignorar\n\n' \
+	--help-button --help-label 'CANCEL' 0 0
+		if [ $? -eq 0 ]; then
+			echo 'public = yes' >> /etc/samba/smb.conf
 		fi
-escrita)
-
-echo "Permitir escrita digite [no]/[yes] ou pressione enter para ignorar"
-	read UserWri
-		if [ ! "$UserWri" ]; then
-			echo "#writable = "$DefaultVariavel >> /etc/samba/smb.conf
+		if  [ $? -eq 1 ]; then
+			echo 'public = no' >> /etc/samba/smb.conf
 		else
-			echo "writable = "$UserWri >> /etc/samba/smb.conf
+            		echo '#public = yes'  >> /etc/samba/smb.conf  
 		fi
-
-echo "Permitir Grupos /Colocar o grupo do usuarios validos digite [@Nome do grupo] ou pressione enter para ignorar"
-	read UserGrup
-		if [ ! "$UserGrup" ]; then
-			echo "#force group = "$DefaultVariavel >> /etc/samba/smb.conf
+		;;
+ escrita)
+	proxima=grupo
+	dialog --title 'writable' --yesno 'Permitir escrita digite [no]/[yes] ou pressione enter para ignorar' \
+	--help-button --help-label 'CANCEL' 0 0
+		if [ $? -eq 0 ]; then
+			echo "writable = yes " >> /etc/samba/smb.conf
+		fi
+		if  [ $? -eq 1 ]; then
+			echo "writable = no " >> /etc/samba/smb.conf
 		else
-			echo "force group = "$UserGrup >> /etc/samba/smb.conf
-			fi	
-
-echo "Grupos Validos/Colocar o grupos dos usuarios: "
-	read UserValid
-		if [ ! "$UserValid" ]; then
-			echo "#valid users = "$DefaultVariavel >> /etc/samba/smb.conf
+			echo "#writable = no" >> /etc/samba/smb.conf
+		fi
+		;;
+grupo)
+	proxima=user
+	nome=$( dialog --stdout --inputbox 'Colocar o grupo do usuarios validos ou pressione CANCEL para ignorar: ' 0 0 "digite @Nome do grupo")
+		if [ ! "$nome"]; then
+			echo "#force group = " >> /etc/samba/smb.conf
 		else
-			echo "valid users = "$UserValid >> /etc/samba/smb.conf
+			echo "force group = "$nome >> /etc/samba/smb.conf
 		fi	
-	
-echo "extenções de arquivos ignorada, digite [ /*.ini ], respeitando o espaço entre cada extenção"
-	read UserHide
+		;;
+user)
+	proxima=exten
+	nome2=$( dialog --stdout --inputbox 'Usuarios Validos ou pressione CANCEL para ignorar: ' 0 0 )
+		if [ ! "$nome2"]; then
+			echo "#valid users = " >> /etc/samba/smb.conf
+		else
+			echo "valid users = "$nome2 >> /etc/samba/smb.conf
+		fi	
+		;;
+exten)
+UserHide=$( dialog  --stdout --inputbox 'extenções de arquivos ignorada: ' 0 0 "digite *.ini ")
 		if [ ! "$UserHide" ]; then
-			echo "#hide files = /*.ini" $DefaultVariavel >> /etc/samba/smb.conf
+			echo "#hide files = /*.ini" >> /etc/samba/smb.conf
 		else
 			echo "hide files = "$UserHide >> /etc/samba/smb.conf
 		fi
+		;;
 	
 echo -e "Fim das escolhas..." ; echo -e "Adcionando Novo compartilhamento"
 echo "###END###" >> /etc/samba/smb.conf ; echo -e " " >> /etc/samba/smb.conf
