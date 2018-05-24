@@ -3,14 +3,14 @@
 # Acionado por /srv/Projeto.Palha/ServerWebApp/scripts/MenuSamba.sh
 #
 # -----------------------------------------------------------------------------------------  #
-
 # Este Programa recebe o nome do compartilhamento cria um breve comentario, pode ser escolhido#
 # uma forma expressa ou adcionando as opções uma a uma.
 #
-#  #######################################################################################   #
+# Atualizações
+# 23/05/2018 - Agora com interface mais amigavel
 #
 ## Licença: LGPL v3 (GNU Lesser General Public License v3.0)
-#---------------------------------------------------------------------------------------------
+#  #######################################################################################   #
 
 echo "Script para configurar novos compartilhamentos no SAMBA "
 
