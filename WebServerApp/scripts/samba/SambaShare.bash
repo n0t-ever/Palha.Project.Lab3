@@ -12,18 +12,21 @@
 ## Licença: LGPL v3 (GNU Lesser General Public License v3.0)
 #  #######################################################################################   #
 #Funções
+function LoadStart () {
+( echo 40 ; sleep 1; echo 75 ; sleep 1; echo 100; sleep 1 ) | dialog --title 'Samba' --gauge '\nAdcionando Novo compartilhamento' 8 40 60 
+}
 function CopyTemplate() {
 echo 'public = yes' ; echo 'writable = yes' ; echo 'guest ok = yes'
 echo 'browseable = yes' ; echo '################' ; echo '###Gerado de Forma Automática###'
 }
 
-echo "Script para configurar novos compartilhamentos no SAMBA "
-
-echo -n "Entre com o nome do novo compartilhamento "; read FolderShare
+dialog --title 'Samba' --infobox '\nScript para configurar novos compartilhamentos ' 0 0
+#Criar o nome e o diretorio.
+FolderShare=$( dialog --inputbox --stdout 'Entre com o nome do novo compartilhamento' 0 0 )
 mkdir /srv/$FolderShare ; chmod 760 /srv/$FolderShare
-
 echo ""["$FolderShare"]"" >> /etc/samba/smb.conf
-echo "Descrição do compartilhamento " ; read CommentFolder
+#Descrição do compartilhamento
+CommentFolder=$( dialog --stdout --inputbox 'Descrição do compartilhamento ' 0 0 )
 echo "comment = "+ $CommentFolder >> /etc/samba/smb.conf
 echo "path = /srv/"$FolderShare >> /etc/samba/smb.conf
 
@@ -33,10 +36,12 @@ dialog --title 'public' --yesno "\nUsar as configurações expressas\n\n" 0 0
 		CopyTemplate >> /etc/samba/smb.conf
 		echo "###END###" >> /etc/samba/smb.conf
 		echo -e " " >> /etc/samba/smb.conf
+		LoadStart
 	else
 	
+#A variavel proximo faz ir a proxima tela. Escolhido entre sim ou não, o botão Cancel inclui a opção comentada.
+#A tecla ESC sai do programa.
 proxima=primeira
-# Vamos começsr a festa
 while : ; do
  case "$proxima" in
  primeira)
@@ -82,16 +87,17 @@ while : ; do
 			echo "#writable = no" >> /etc/samba/smb.conf
 		fi
 		;;
-grupo)
+ grupo)
 	proxima=user
-	nome=$( dialog --stdout --inputbox 'Colocar o grupo do usuarios validos ou pressione CANCEL para ignorar: ' 0 0 "digite @Nome do grupo")
+	nome=$( dialog --stdout --inputbox 'Colocar o grupo do usuarios validos ou pressione CANCEL para ignorar: ' \
+	0 0 "digite @Nome do grupo")
 		if [ ! "$nome"]; then
 			echo "#force group = " >> /etc/samba/smb.conf
 		else
 			echo "force group = "$nome >> /etc/samba/smb.conf
 		fi	
 		;;
-user)
+ user)
 	proxima=exten
 	nome2=$( dialog --stdout --inputbox 'Usuarios Validos ou pressione CANCEL para ignorar: ' 0 0 )
 		if [ ! "$nome2"]; then
@@ -101,19 +107,20 @@ user)
 		fi	
 		;;
 exten)
-UserHide=$( dialog  --stdout --inputbox 'extenções de arquivos ignorada: ' 0 0 "digite *.ini ")
+	UserHide=$( dialog  --stdout --inputbox 'extenções de arquivos ignorada: ' 0 0 "digite *.ini ")
 		if [ ! "$UserHide" ]; then
 			echo "#hide files = /*.ini" >> /etc/samba/smb.conf
 		else
 			echo "hide files = "$UserHide >> /etc/samba/smb.conf
 		fi
 		;;
-	
-echo -e "Fim das escolhas..." ; echo -e "Adcionando Novo compartilhamento"
+		
 echo "###END###" >> /etc/samba/smb.conf ; echo -e " " >> /etc/samba/smb.conf
+LoadStart
 
-fi	
-esac
-done
-echo "That's all folks!"
-/etc/init.d/samba restart ; bash /srv/Projeto.Palha/ServerWebApp/scripts/MenuSamba.sh
+fi
+	retorno=$?
+	[ $retorno -eq 255 ] && break	#ESC
+esac; done
+dialog --title 'Parabens' --msgbox 'That's all folks!' 6 40
+/etc/init.d/samba stop && /etc/init.d/samba start
